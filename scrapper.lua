@@ -1,4 +1,3 @@
---test
 -- If you want to hardcode toc or slug in and not enter it, do so here
 local ADDON_SLUG
 local TOC_FILE
@@ -8,10 +7,10 @@ local AUTO_IDENTIFY_SLUG = "./"
 local AUTO_FIND_TOC = "./"
 -- Only necessary if you aren't auto identify the slug, curseforge or wowace.
 local SITE_LOCATION = nil
--- Personally I keep the api key in another file and just ahve this reference that to get it
+-- Personally I keep the api key in another file and just have this reference that to get it
 -- If you want to do this, create the file with CURSE_API_KEY = "<key>" in it and set the path here
 -- set this to nil and it will ask you for your API key
-local API_KEY_FILE = "../AddOns/TestCode/api-key.lua"
+local API_KEY_FILE = "../TestCode/api-key.lua"
 -- Patterns that should not be scrapped, case-insensitive
 -- Anything between the no-lib-strip is automatically ignored
 local FILE_BLACKLIST = {"^localization", "^lib"}
@@ -142,13 +141,15 @@ print("")
 local ignore
 local localizedKeys = {}
 for line in io.lines(TOC_FILE) do
+	line = string.gsub(line, "\r", "")
+	
 	if( string.match(line, "#@no%-lib%-strip@") ) then
 		ignore = true
 	elseif( string.match(line, "#@end%-no%-lib%-strip@") ) then
 		ignore = nil
 	end
-	
-	if( not ignore and string.match(line, "lua$") ) then
+		
+	if( not ignore and string.match(line, "%.lua") ) then
 		-- Make sure it's a valid file
 		local blacklist
 		for _, check in pairs(FILE_BLACKLIST) do
@@ -160,6 +161,11 @@ for line in io.lines(TOC_FILE) do
 	
 		-- File checks out, scrap everything
 		if( not blacklist ) then
+			-- Fix slashes
+			if( OS_TYPE == "linux" ) then
+				line = string.gsub(line, "\\", "/")
+			end
+			
 			local keys = 0
 			local contents = io.open(line):read("*all")
 		
@@ -168,7 +174,7 @@ for line in io.lines(TOC_FILE) do
 				localizedKeys[match] = true
 			end
 			
-			print(string.format("%s, found %d keys", line, keys))
+			print(string.format("%s (%d keys)", line, keys))
 		end
 	end
 end
