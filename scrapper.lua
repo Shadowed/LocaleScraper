@@ -122,8 +122,8 @@ if( not TOC_FILE ) then
 	while( not TOC_FILE ) do
 		io.stdout:write("TOC path: ")
 		TOC_FILE = io.stdin:read("*line")
+		TOC_FILE = TOC_FILE ~= "" and TOC_FILE or nil
 		if( TOC_FILE ) then
-			TOC_FILE = string.trim(TOC_FILE) ~= "" and string.trim(TOC_FILE) or TOC_FILE
 			local file = io.open(TOC_FILE)
 			if( file ) then
 				file:close()
